@@ -3,6 +3,7 @@ CLAUDE.md
 structure.md
 target/
 .mvn/wrapper/maven-wrapper.jar
+application.properties
 !**/src/main/**/target/
 !**/src/test/**/target/
 
