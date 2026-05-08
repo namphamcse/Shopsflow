@@ -19,16 +19,13 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 100)
     private String name;
-    
-    private String description;
 
     @ManyToMany(mappedBy = "categories")
     private List<Product> products = new ArrayList<>();
 
-    public Category(String name, String description) {
+    public Category(String name) {
         this.name = name;
-        this.description = description;
     }
 }
