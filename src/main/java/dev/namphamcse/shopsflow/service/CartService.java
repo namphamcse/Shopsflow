@@ -82,7 +82,7 @@ public class CartService {
         return getCart(user);
     }
 
-    @Transactional
+    @Transactional ///
     public void clearCart (User user) {
         cartItemRepo.deleteByUser(user);
     }
