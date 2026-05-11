@@ -1,6 +1,7 @@
 HELP.md
 CLAUDE.md
 structure.md
+endsession.md
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
