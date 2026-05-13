@@ -34,6 +34,9 @@ public class CategoryService {
 
     @Transactional
     public CategoryResponse createCategory(CategoryRequest req) {
+        if (categoryRepo.existsByName(req.getName())) {
+            throw new ResourceNotFoundException("Category not found: " + req.getName());
+        }
         Category c = CategoryMapper.toEntity(req);
         Category saved = categoryRepo.save(c);
         return CategoryMapper.toResponse(saved);

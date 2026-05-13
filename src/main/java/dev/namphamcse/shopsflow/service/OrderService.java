@@ -49,7 +49,6 @@ public class OrderService {
                 throw new IllegalArgumentException("Insufficient stock for product: " + product.getName());
             }
 
-            // Deduct stock
             product.setStockQuantity(product.getStockQuantity() - cartItem.getQuantity());
             productRepo.save(product);
 
