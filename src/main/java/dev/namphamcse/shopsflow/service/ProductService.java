@@ -3,6 +3,8 @@ package dev.namphamcse.shopsflow.service;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,9 +45,10 @@ public class ProductService {
         return ProductMapper.toResponse(p);
     }
 
-    public List<ProductResponse> searchProducts(
+    public Page<ProductResponse> searchProducts(
         String keyword, Long categoryId,
-        BigDecimal minPrice, BigDecimal maxPrice) {
+        BigDecimal minPrice, BigDecimal maxPrice,
+        Pageable pageable) {
 
         Specification<Product> spec = Specification
             .where(ProductSpecifications.hasKeyword(keyword))
@@ -53,10 +56,8 @@ public class ProductService {
             .and(ProductSpecifications.priceAtLeast(minPrice))
             .and(ProductSpecifications.priceAtMost(maxPrice));
 
-        return productRepo.findAll(spec)
-                .stream()
-                .map(ProductMapper::toResponse)
-                .toList();
+        return productRepo.findAll(spec, pageable)
+                .map(ProductMapper::toResponse);    
     }
 
     @Transactional
