@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import dev.namphamcse.shopsflow.dto.request.CategoryRequest;
 import dev.namphamcse.shopsflow.dto.response.CategoryResponse;
 import dev.namphamcse.shopsflow.entity.Category;
+import dev.namphamcse.shopsflow.exception.BusinessRuleViolationException;
+import dev.namphamcse.shopsflow.exception.DuplicateResourceException;
 import dev.namphamcse.shopsflow.exception.ResourceNotFoundException;
 import dev.namphamcse.shopsflow.mapper.CategoryMapper;
 import dev.namphamcse.shopsflow.repository.CategoryRepository;
@@ -32,10 +34,10 @@ public class CategoryService {
         return CategoryMapper.toResponse(c);
     }
 
-    @Transactional ///
+    @Transactional 
     public CategoryResponse createCategory(CategoryRequest req) {
         if (categoryRepo.existsByName(req.getName())) {
-            throw new ResourceNotFoundException("Category not found: " + req.getName());
+            throw new DuplicateResourceException("Category name already exists: " + req.getName());
         }
         Category c = CategoryMapper.toEntity(req);
         Category saved = categoryRepo.save(c);
@@ -56,7 +58,7 @@ public class CategoryService {
         Category c = categoryRepo.findById(id).
             orElseThrow(() -> new ResourceNotFoundException("Category not found: " + id));
         if (!c.getProducts().isEmpty()) {
-            throw new IllegalStateException("Cannot delete category with products attached");
+            throw new BusinessRuleViolationException("Cannot delete category with products attached");
         }
         categoryRepo.delete(c);
     }

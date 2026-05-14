@@ -11,6 +11,7 @@ import dev.namphamcse.shopsflow.dto.response.CartResponse;
 import dev.namphamcse.shopsflow.entity.CartItem;
 import dev.namphamcse.shopsflow.entity.Product;
 import dev.namphamcse.shopsflow.entity.User;
+import dev.namphamcse.shopsflow.exception.BusinessRuleViolationException;
 import dev.namphamcse.shopsflow.exception.ResourceNotFoundException;
 import dev.namphamcse.shopsflow.mapper.CartMapper;
 import dev.namphamcse.shopsflow.repository.CartItemRepository;
@@ -39,8 +40,7 @@ public class CartService {
 
         int newQuantity = item.getQuantity() + req.getQuantity();
         if (newQuantity > p.getStockQuantity()) {
-            throw new IllegalArgumentException(
-                "Requested quantity exceeds available stock: " + p.getStockQuantity());
+            throw new BusinessRuleViolationException("Requested quantity exceeds available stock: " + p.getStockQuantity());
         }
         item.setQuantity(newQuantity);
         cartItemRepo.save(item);
@@ -59,8 +59,7 @@ public class CartService {
 
         Product p = item.getProduct();
         if (req.getQuantity() > p.getStockQuantity()) {
-            throw new IllegalArgumentException(
-                "Requested quantity exceeds available stock: " + p.getStockQuantity());
+            throw new BusinessRuleViolationException("Requested quantity exceeds available stock: " + p.getStockQuantity());
         }
 
         item.setQuantity(req.getQuantity());

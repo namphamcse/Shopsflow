@@ -9,6 +9,7 @@ import dev.namphamcse.shopsflow.dto.request.LoginRequest;
 import dev.namphamcse.shopsflow.dto.request.RegisterRequest;
 import dev.namphamcse.shopsflow.dto.response.AuthResponse;
 import dev.namphamcse.shopsflow.entity.User;
+import dev.namphamcse.shopsflow.exception.DuplicateResourceException;
 import dev.namphamcse.shopsflow.repository.UserRepository;
 import dev.namphamcse.shopsflow.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ public class AuthService {
 
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            throw new DuplicateResourceException("Email already exists: " + request.getEmail());
         }
         User user = new User(
                 request.getName(),

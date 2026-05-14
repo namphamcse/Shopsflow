@@ -5,7 +5,7 @@ import java.util.Map;
 
 public record ErrorResponse(
         int status,
-        String messgae,
+        String message,
         Instant timestamp,
         String path,
         Map<String, String> fieldErrors // null when not a validation error

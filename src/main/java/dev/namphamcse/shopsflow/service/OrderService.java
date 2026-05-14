@@ -15,6 +15,7 @@ import dev.namphamcse.shopsflow.entity.Product;
 import dev.namphamcse.shopsflow.entity.User;
 import dev.namphamcse.shopsflow.entity.enums.OrderStatus;
 import dev.namphamcse.shopsflow.entity.enums.Role;
+import dev.namphamcse.shopsflow.exception.BusinessRuleViolationException;
 import dev.namphamcse.shopsflow.exception.ResourceNotFoundException;
 import dev.namphamcse.shopsflow.mapper.OrderMapper;
 import dev.namphamcse.shopsflow.repository.CartItemRepository;
@@ -34,9 +35,8 @@ public class OrderService {
     public OrderResponse placeOrder(User user) {
         List<CartItem> cartItems = cartItemRepo.findByUser(user);
         if (cartItems.isEmpty()) {
-            throw new IllegalStateException("Cannot place order with an empty cart");
+            throw new BusinessRuleViolationException("Cannot place order with an empty cart");
         }
-
         BigDecimal totalAmount = BigDecimal.ZERO;
         Order order = new Order();
         order.setUser(user);
@@ -47,7 +47,7 @@ public class OrderService {
         for (CartItem cartItem : cartItems) {
             Product product = cartItem.getProduct();
             if (product.getStockQuantity() < cartItem.getQuantity()) {
-                throw new IllegalArgumentException("Insufficient stock for product: " + product.getName());
+                throw new BusinessRuleViolationException("Insufficient stock for product: " + product.getName());
             }
 
             product.setStockQuantity(product.getStockQuantity() - cartItem.getQuantity());
