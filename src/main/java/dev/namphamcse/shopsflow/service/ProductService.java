@@ -1,7 +1,9 @@
 package dev.namphamcse.shopsflow.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +15,7 @@ import dev.namphamcse.shopsflow.exception.ResourceNotFoundException;
 import dev.namphamcse.shopsflow.mapper.ProductMapper;
 import dev.namphamcse.shopsflow.repository.CategoryRepository;
 import dev.namphamcse.shopsflow.repository.ProductRepository;
+import dev.namphamcse.shopsflow.repository.spec.ProductSpecifications;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -40,8 +43,17 @@ public class ProductService {
         return ProductMapper.toResponse(p);
     }
 
-    public List<ProductResponse> getAllProducts() {
-        return productRepo.findAll()
+    public List<ProductResponse> searchProducts(
+        String keyword, Long categoryId,
+        BigDecimal minPrice, BigDecimal maxPrice) {
+
+        Specification<Product> spec = Specification
+            .where(ProductSpecifications.hasKeyword(keyword))
+            .and(ProductSpecifications.inCategory(categoryId))
+            .and(ProductSpecifications.priceAtLeast(minPrice))
+            .and(ProductSpecifications.priceAtMost(maxPrice));
+
+        return productRepo.findAll(spec)
                 .stream()
                 .map(ProductMapper::toResponse)
                 .toList();

@@ -1,5 +1,6 @@
 package dev.namphamcse.shopsflow.controller;
 
+import java.math.BigDecimal;
 import java.net.URI;
 import java.util.List;
 
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import dev.namphamcse.shopsflow.dto.request.ProductRequest;
@@ -27,8 +29,13 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
-    public ResponseEntity<List<ProductResponse>> getAllProducts() {
-        return ResponseEntity.ok(productService.getAllProducts());
+    public ResponseEntity<List<ProductResponse>> searchProducts(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice) {
+        return ResponseEntity.ok(productService.searchProducts(keyword, categoryId,
+                minPrice, maxPrice));
     }
 
     @GetMapping("/{id}")
@@ -41,8 +48,8 @@ public class ProductController {
     public ResponseEntity<ProductResponse> createProduct(@Valid @RequestBody ProductRequest req) {
         ProductResponse created = productService.createProduct(req);
         return ResponseEntity
-            .created(URI.create("/api/products/" + created.getId()))
-            .body(created);
+                .created(URI.create("/api/products/" + created.getId()))
+                .body(created);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
