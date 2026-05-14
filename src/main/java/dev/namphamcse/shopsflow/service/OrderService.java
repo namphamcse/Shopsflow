@@ -14,6 +14,7 @@ import dev.namphamcse.shopsflow.entity.OrderItem;
 import dev.namphamcse.shopsflow.entity.Product;
 import dev.namphamcse.shopsflow.entity.User;
 import dev.namphamcse.shopsflow.entity.enums.OrderStatus;
+import dev.namphamcse.shopsflow.entity.enums.Role;
 import dev.namphamcse.shopsflow.exception.ResourceNotFoundException;
 import dev.namphamcse.shopsflow.mapper.OrderMapper;
 import dev.namphamcse.shopsflow.repository.CartItemRepository;
@@ -54,13 +55,12 @@ public class OrderService {
 
             BigDecimal priceAtPurchase = product.getPrice();
             OrderItem orderItem = new OrderItem(
-                order,
-                product,
-                cartItem.getQuantity(),
-                priceAtPurchase
-            );
+                    order,
+                    product,
+                    cartItem.getQuantity(),
+                    priceAtPurchase);
             orderItems.add(orderItem);
-            
+
             BigDecimal itemSubtotal = priceAtPurchase.multiply(BigDecimal.valueOf(cartItem.getQuantity()));
             totalAmount = totalAmount.add(itemSubtotal);
         }
@@ -76,18 +76,35 @@ public class OrderService {
 
     public List<OrderResponse> getUserOrders(User user) {
         return orderRepo.findByUserOrderByCreatedAtDesc(user).stream()
-            .map(OrderMapper::toOrderResponse)
-            .toList();
+                .map(OrderMapper::toOrderResponse)
+                .toList();
     }
 
     public OrderResponse getOrderById(User user, Long id) {
         Order order = orderRepo.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Order not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found: " + id));
 
-        if (!order.getUser().getId().equals(user.getId())) {
+        boolean isAdmin = user.getRole() == Role.ADMIN;
+
+        if (!isAdmin && !order.getUser().getId().equals(user.getId())) {
             throw new ResourceNotFoundException("Order not found: " + id);
         }
 
         return OrderMapper.toOrderResponse(order);
+    }
+
+    @Transactional
+    public OrderResponse updateOrderStatus(Long id, OrderStatus status) {
+        Order order = orderRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found: " + id));
+        order.setStatus(status);
+        return OrderMapper.toOrderResponse(order);
+    }
+
+    public List<OrderResponse> findAllOrders() {
+        return orderRepo.findAll()
+            .stream()
+            .map(OrderMapper::toOrderResponse)
+            .toList();
     }
 }

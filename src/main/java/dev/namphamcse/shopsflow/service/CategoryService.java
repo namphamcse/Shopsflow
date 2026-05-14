@@ -32,7 +32,7 @@ public class CategoryService {
         return CategoryMapper.toResponse(c);
     }
 
-    @Transactional
+    @Transactional ///
     public CategoryResponse createCategory(CategoryRequest req) {
         if (categoryRepo.existsByName(req.getName())) {
             throw new ResourceNotFoundException("Category not found: " + req.getName());
