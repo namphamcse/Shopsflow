@@ -18,7 +18,7 @@ public class ProductRequest {
     private String description;
 
     @NotNull
-    @DecimalMin(value = "0.00", inclusive = true)
+    @Positive
     private BigDecimal price;
 
     @Size(max = 500)
