@@ -2,6 +2,8 @@ package dev.namphamcse.shopsflow.service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -50,14 +52,17 @@ public class ProductService {
         BigDecimal minPrice, BigDecimal maxPrice,
         Pageable pageable) {
 
-        Specification<Product> spec = Specification
-            .where(ProductSpecifications.hasKeyword(keyword))
-            .and(ProductSpecifications.inCategory(categoryId))
-            .and(ProductSpecifications.priceAtLeast(minPrice))
-            .and(ProductSpecifications.priceAtMost(maxPrice));
+        Specification<Product> spec = Stream.of(
+                ProductSpecifications.hasKeyword(keyword),
+                ProductSpecifications.inCategory(categoryId),
+                ProductSpecifications.priceAtLeast(minPrice),
+                ProductSpecifications.priceAtMost(maxPrice))
+            .filter(Objects::nonNull)
+            .reduce(Specification::and)
+            .orElse((root, query, cb) -> cb.conjunction());
 
         return productRepo.findAll(spec, pageable)
-                .map(ProductMapper::toResponse);    
+                .map(ProductMapper::toResponse);
     }
 
     @Transactional
