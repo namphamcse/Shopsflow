@@ -1,0 +1,30 @@
+name: shopsflow
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=shopsflow
+      - POSTGRES_PASSWORD=shopsflow
+      - POSTGRES_DB=shopsflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    environment:
+      - DB_URL=jdbc:postgresql://postgres:5432/shopsflow
+      - DB_USERNAME=shopsflow
+      - DB_PASSWORD=shopsflow
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRATION=${JWT_EXPIRATION}
+    ports:
+      - "8080:8080"
+
+volumes:
+  pgdata:
