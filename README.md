@@ -3,6 +3,11 @@
 A REST API backend for a small e-commerce platform, built with Spring Boot 4 and PostgreSQL. Supports user authentication, product catalog with search and filtering, shopping cart, and order management with role-based access control.
 
 [![CI](https://github.com/namphamcse/Shopsflow/actions/workflows/ci.yml/badge.svg)](https://github.com/namphamcse/Shopsflow/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Java](https://img.shields.io/badge/Java-21-orange?logo=openjdk&logoColor=white)](https://adoptium.net/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.6-6DB33F?logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white)](Dockerfile)
 
 ---
 
@@ -139,7 +144,7 @@ Authorization: Bearer <token>
 
 ```
 src/main/java/dev/namphamcse/shopsflow/
-├── config/             # Spring configuration (SecurityConfig, OpenApiConfig)
+├── config/             # Spring configuration (SecurityConfig, OpenApiConfig, DataInitializer)
 ├── controller/         # REST controllers
 ├── dto/
 │   ├── request/        # Inbound DTOs with validation
@@ -168,3 +173,6 @@ CI runs the full test suite on every push and pull request to `main` — see `.g
 
 ---
 
+## License
+
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
