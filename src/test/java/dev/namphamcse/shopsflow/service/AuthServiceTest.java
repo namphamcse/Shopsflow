@@ -24,6 +24,7 @@ import dev.namphamcse.shopsflow.dto.request.LoginRequest;
 import dev.namphamcse.shopsflow.dto.request.RegisterRequest;
 import dev.namphamcse.shopsflow.dto.response.AuthResponse;
 import dev.namphamcse.shopsflow.entity.User;
+import dev.namphamcse.shopsflow.entity.enums.Role;
 import dev.namphamcse.shopsflow.exception.DuplicateResourceException;
 import dev.namphamcse.shopsflow.repository.UserRepository;
 import dev.namphamcse.shopsflow.security.JwtUtil;
@@ -75,6 +76,11 @@ class AuthServiceTest {
         when(userRepo.existsByEmail("n@x.com")).thenReturn(false);
         when(passwordEncoder.encode("password123")).thenReturn("HASHED");
         when(jwtUtil.generateToken(any(User.class))).thenReturn("jwt-token");
+        when(userRepo.save(any(User.class))).thenAnswer(invocation -> {
+            User user = invocation.getArgument(0);
+            user.setId(1L);
+            return user;
+        });
 
         AuthResponse response = authService.register(registerRequest);
 
@@ -87,6 +93,11 @@ class AuthServiceTest {
 
         assertNotNull(response);
         assertEquals("jwt-token", response.getToken());
+        assertNotNull(response.getUser());
+        assertEquals(1L, response.getUser().getId());
+        assertEquals("Nam", response.getUser().getName());
+        assertEquals("n@x.com", response.getUser().getEmail());
+        assertEquals(Role.USER, response.getUser().getRole());
         verify(jwtUtil).generateToken(saved);
     }
 
@@ -95,6 +106,7 @@ class AuthServiceTest {
         when(userRepo.existsByEmail("n@x.com")).thenReturn(false);
         when(passwordEncoder.encode("password123")).thenReturn("HASHED");
         when(jwtUtil.generateToken(any(User.class))).thenReturn("jwt-token");
+        when(userRepo.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         authService.register(registerRequest);
 
@@ -121,6 +133,11 @@ class AuthServiceTest {
         assertEquals("password123", captor.getValue().getCredentials());
 
         assertEquals("jwt-token", response.getToken());
+        assertNotNull(response.getUser());
+        assertEquals(1L, response.getUser().getId());
+        assertEquals("Nam", response.getUser().getName());
+        assertEquals("n@x.com", response.getUser().getEmail());
+        assertEquals(Role.USER, response.getUser().getRole());
     }
 
     @Test
