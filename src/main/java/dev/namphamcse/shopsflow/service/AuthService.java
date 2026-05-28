@@ -10,6 +10,7 @@ import dev.namphamcse.shopsflow.dto.request.RegisterRequest;
 import dev.namphamcse.shopsflow.dto.response.AuthResponse;
 import dev.namphamcse.shopsflow.entity.User;
 import dev.namphamcse.shopsflow.exception.DuplicateResourceException;
+import dev.namphamcse.shopsflow.mapper.UserMapper;
 import dev.namphamcse.shopsflow.repository.UserRepository;
 import dev.namphamcse.shopsflow.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -31,9 +32,9 @@ public class AuthService {
                 request.getName(),
                 request.getEmail(),
                 passwordEncoder.encode(request.getPassword()));
-        userRepository.save(user);
-        String token = jwtUtil.generateToken(user);
-        return new AuthResponse(token);
+        User newUser = userRepository.save(user);
+        String token = jwtUtil.generateToken(newUser);
+        return new AuthResponse(token, UserMapper.toResponse(newUser));
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -42,6 +43,6 @@ public class AuthService {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow();
         String token = jwtUtil.generateToken(user);
-        return new AuthResponse(token);
+        return new AuthResponse(token, UserMapper.toResponse(user));
     }
 }
