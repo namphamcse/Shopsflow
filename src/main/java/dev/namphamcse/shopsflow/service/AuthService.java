@@ -24,7 +24,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
 
-    public AuthResponse register(RegisterRequest request) {
+    public void register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new DuplicateResourceException("Email already exists: " + request.getEmail());
         }
@@ -32,9 +32,7 @@ public class AuthService {
                 request.getName(),
                 request.getEmail(),
                 passwordEncoder.encode(request.getPassword()));
-        User newUser = userRepository.save(user);
-        String token = jwtUtil.generateToken(newUser);
-        return new AuthResponse(token, UserMapper.toResponse(newUser));
+        userRepository.save(user);
     }
 
     public AuthResponse login(LoginRequest request) {

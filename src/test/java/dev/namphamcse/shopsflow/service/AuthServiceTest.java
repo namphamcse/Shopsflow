@@ -72,17 +72,16 @@ class AuthServiceTest {
     }
 
     @Test
-    void register_hashesPassword_savesUser_returnsToken() {
+    void register_hashesPassword_savesUser() {
         when(userRepo.existsByEmail("n@x.com")).thenReturn(false);
         when(passwordEncoder.encode("password123")).thenReturn("HASHED");
-        when(jwtUtil.generateToken(any(User.class))).thenReturn("jwt-token");
         when(userRepo.save(any(User.class))).thenAnswer(invocation -> {
             User user = invocation.getArgument(0);
             user.setId(1L);
             return user;
         });
 
-        AuthResponse response = authService.register(registerRequest);
+        authService.register(registerRequest);
 
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
         verify(userRepo).save(captor.capture());
@@ -90,22 +89,13 @@ class AuthServiceTest {
         assertEquals("Nam", saved.getName());
         assertEquals("n@x.com", saved.getEmail());
         assertEquals("HASHED", saved.getPassword());
-
-        assertNotNull(response);
-        assertEquals("jwt-token", response.getToken());
-        assertNotNull(response.getUser());
-        assertEquals(1L, response.getUser().getId());
-        assertEquals("Nam", response.getUser().getName());
-        assertEquals("n@x.com", response.getUser().getEmail());
-        assertEquals(Role.USER, response.getUser().getRole());
-        verify(jwtUtil).generateToken(saved);
+        verify(jwtUtil, never()).generateToken(any());
     }
 
     @Test
     void register_doesNotStoreRawPassword() {
         when(userRepo.existsByEmail("n@x.com")).thenReturn(false);
         when(passwordEncoder.encode("password123")).thenReturn("HASHED");
-        when(jwtUtil.generateToken(any(User.class))).thenReturn("jwt-token");
         when(userRepo.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         authService.register(registerRequest);
