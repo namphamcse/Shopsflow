@@ -19,6 +19,7 @@ import dev.namphamcse.shopsflow.exception.ResourceNotFoundException;
 import dev.namphamcse.shopsflow.mapper.ProductMapper;
 import dev.namphamcse.shopsflow.repository.CategoryRepository;
 import dev.namphamcse.shopsflow.repository.ProductRepository;
+import dev.namphamcse.shopsflow.repository.ReviewRepository;
 import dev.namphamcse.shopsflow.repository.spec.ProductSpecifications;
 import lombok.RequiredArgsConstructor;
 
@@ -28,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 public class ProductService {
     private final ProductRepository productRepo;
     private final CategoryRepository categoryRepo;
+    private final ReviewRepository reviewRepo;
 
     private List<Category> resolveCategories(List<Long> ids) {
         if (ids == null || ids.isEmpty()) {
@@ -88,6 +90,7 @@ public class ProductService {
         if (!productRepo.existsById(id)) {
             throw new ResourceNotFoundException("Product not found: " + id);
         }
+        reviewRepo.deleteByProductId(id);
         productRepo.deleteById(id);
     }
 }

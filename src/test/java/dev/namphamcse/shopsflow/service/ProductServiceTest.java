@@ -17,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
@@ -32,6 +33,7 @@ import dev.namphamcse.shopsflow.entity.Product;
 import dev.namphamcse.shopsflow.exception.ResourceNotFoundException;
 import dev.namphamcse.shopsflow.repository.CategoryRepository;
 import dev.namphamcse.shopsflow.repository.ProductRepository;
+import dev.namphamcse.shopsflow.repository.ReviewRepository;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
@@ -40,6 +42,8 @@ class ProductServiceTest {
     ProductRepository productRepo;
     @Mock
     CategoryRepository categoryRepo;
+    @Mock
+    ReviewRepository reviewRepo;
 
     @InjectMocks
     ProductService productService;
@@ -213,6 +217,7 @@ class ProductServiceTest {
         assertThrows(ResourceNotFoundException.class,
                 () -> productService.deleteProduct(999L));
 
+        verify(reviewRepo, never()).deleteByProductId(any());
         verify(productRepo, never()).deleteById(any());
     }
 
@@ -222,7 +227,9 @@ class ProductServiceTest {
 
         productService.deleteProduct(100L);
 
-        verify(productRepo).deleteById(100L);
+        InOrder inOrder = inOrder(reviewRepo, productRepo);
+        inOrder.verify(reviewRepo).deleteByProductId(100L);
+        inOrder.verify(productRepo).deleteById(100L);
     }
 
 

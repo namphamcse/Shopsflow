@@ -9,4 +9,5 @@ import dev.namphamcse.shopsflow.entity.Review;
 public interface ReviewRepository extends JpaRepository<Review, Long>{
     boolean existsByUserIdAndProductId(Long userId, Long productId);
     List<Review> findByProductId(Long productId);
+    void deleteByProductId(Long productId);
 }
