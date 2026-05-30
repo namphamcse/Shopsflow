@@ -1,6 +1,6 @@
 # ShopsFlow
 
-A REST API backend for a small e-commerce platform, built with Spring Boot 4 and PostgreSQL. Supports user authentication, product catalog with search and filtering, shopping cart, and order management with role-based access control.
+A REST API backend for a small e-commerce platform, built with Spring Boot 4 and PostgreSQL. Supports user authentication, product catalog with search and filtering, product reviews, shopping cart, and order management with role-based access control.
 
 [![CI](https://github.com/namphamcse/Shopsflow/actions/workflows/ci.yml/badge.svg)](https://github.com/namphamcse/Shopsflow/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -16,6 +16,7 @@ A REST API backend for a small e-commerce platform, built with Spring Boot 4 and
 - **JWT authentication** — stateless email/password login with BCrypt password hashing.
 - **Role-based access control** — `USER` and `ADMIN` roles enforced via `@PreAuthorize` on controller methods.
 - **Product catalog** — CRUD with admin-only writes; public reads support keyword search, category filter, and price range filter.
+- **Product reviews** - authenticated users can create, edit, and delete their own reviews; product review lists are public.
 - **Pagination & sorting** — `Pageable` parameters on the product list endpoint.
 - **Shopping cart** — per-user cart with add / update / remove operations.
 - **Orders** — checkout converts cart to order; users see their own orders, admins see all and can update status.
@@ -101,6 +102,17 @@ Full interactive docs at `/swagger-ui.html` once the app is running. Quick refer
 
 `GET /api/products` supports the query params `keyword`, `categoryId`, `minPrice`, `maxPrice`, plus standard `Pageable` params (`page`, `size`, `sort`).
 
+### Reviews
+
+| Method | Path                                | Auth   | Description                   |
+| ------ | ----------------------------------- | ------ | ----------------------------- |
+| GET    | `/api/products/{productId}/reviews` | public | List reviews for one product  |
+| POST   | `/api/products/{productId}/reviews` | user   | Create review for one product |
+| PUT    | `/api/reviews/{reviewId}`           | owner  | Edit own review               |
+| DELETE | `/api/reviews/{reviewId}`           | owner  | Delete own review             |
+
+Review requests require `stars` from `1` to `5`; `comment` is optional and limited to 2000 characters. Each user can review a product only once.
+
 ### Categories — `/api/categories`
 
 | Method | Path    | Auth    | Description |
@@ -167,7 +179,7 @@ All services have Mockito unit tests (no Spring context, no database):
 ./mvnw test
 ```
 
-Tests live in `src/test/java/dev/namphamcse/shopsflow/service/` and cover `AuthService`, `CartService`, `CategoryService`, `OrderService`, and `ProductService`.
+Tests live in `src/test/java/dev/namphamcse/shopsflow/service/` and cover `AuthService`, `CartService`, `CategoryService`, `OrderService`, `ProductService`, and `ReviewService`.
 
 CI runs the full test suite on every push and pull request to `main` — see `.github/workflows/ci.yml`.
 
